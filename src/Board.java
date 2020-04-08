@@ -19,6 +19,12 @@ public class Board extends JPanel{
 		this.setOpaque(true);
 		this.setBackground(new Color(255,255,255));
 		
+		initPanels();
+		initSlots();
+		addComponents();	
+	}
+	
+	private void initPanels() {
 		///SOUTH///
 		south = new JPanel();
 		south.setLayout(new FlowLayout());
@@ -59,14 +65,6 @@ public class Board extends JPanel{
 		west.setOpaque(true);
 		west.setBackground(new Color(255,255,255));
 		//////////
-		
-		this.add(south, BorderLayout.SOUTH);
-		this.add(east, BorderLayout.EAST);  
-		this.add(north, BorderLayout.NORTH);
-		this.add(west, BorderLayout.WEST); 
-		
-		initSlots();
-		addComponents();	
 	}
 	
 	private void initSlots() {
