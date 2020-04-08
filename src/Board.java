@@ -1,20 +1,23 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class Board {
+public class Board extends JPanel{
 	
-	private Container parent;
+	private static final long serialVersionUID = 134606650518445714L;
+	
 	private JPanel south, west, north, east;
 	
-	public Board(Container parent) {
+	public Board() {
 		
-		this.parent = parent;
+		this.setLayout(new BorderLayout());
+		((BorderLayout)this.getLayout()).setVgap(-1);
+		
+		this.setOpaque(true);
+		this.setBackground(new Color(255,255,255));
 		
 		///SOUTH///
 		south = new JPanel();
@@ -57,8 +60,13 @@ public class Board {
 		west.setBackground(new Color(255,255,255));
 		//////////
 		
+		this.add(south, BorderLayout.SOUTH);
+		this.add(east, BorderLayout.EAST);  
+		this.add(north, BorderLayout.NORTH);
+		this.add(west, BorderLayout.WEST); 
+		
 		initSlots();
-		addToParent();	
+		addComponents();	
 	}
 	
 	private void initSlots() {
@@ -68,6 +76,12 @@ public class Board {
 			button[i].setMinimumSize(new Dimension(162,138));
 			button[i].setPreferredSize(new Dimension(162,138));
 			button[i].setMaximumSize(new Dimension(162,138));
+			button[i].addActionListener(
+					(e)->
+					{
+						this.setVisible(false);
+					}
+			);
 			if(i > -1 && i < 8)
 				south.add(button[i]);
 			else if(i > 7 && i < 11) {
@@ -91,11 +105,11 @@ public class Board {
 		}
 	}
 	
-	private void addToParent() {
-		parent.add(south, BorderLayout.SOUTH);
-		parent.add(east, BorderLayout.EAST);
-		parent.add(north, BorderLayout.NORTH);
-		parent.add(west, BorderLayout.WEST);
+	private void addComponents() {
+		this.add(south, BorderLayout.SOUTH);
+		this.add(east, BorderLayout.EAST);  
+		this.add(north, BorderLayout.NORTH);
+		this.add(west, BorderLayout.WEST); 
 	}
 	
 }

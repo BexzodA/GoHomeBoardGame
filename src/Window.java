@@ -1,14 +1,11 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public class Window {
 	
 	private JFrame window;
+	@SuppressWarnings("unused")
 	private Board gameBoard;
 	//private JPanel south, west, north, east;
 	
@@ -24,7 +21,9 @@ public class Window {
 		
 		((BorderLayout)window.getContentPane().getLayout()).setVgap(-1);
 		
-		gameBoard = new Board(window.getContentPane());
+		gameBoard = new Board();
+		
+		window.add(gameBoard);
 		
 		window.setVisible(true);
 	}
