@@ -5,6 +5,8 @@ import javax.swing.JButton;
 
 public class BoardSlot extends JButton {
 	
+	private static final long serialVersionUID = 1L;
+	
 	private static final Color highlighColor = new Color(0,0,0);
 	private static final Color pressedColor = new Color(230,230,230);
 	private static final Color textColor = new Color(0,0,0);

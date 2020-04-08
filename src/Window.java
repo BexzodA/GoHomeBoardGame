@@ -1,11 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -15,7 +11,6 @@ public class Window {
 	private JFrame window;
 	
 	private JPanel south, west, north, east;
-	private JPanel westCenter, eastCenter;
 	
 	public Window(String name, int width, int height) {
 		window = new JFrame(name);
@@ -85,8 +80,9 @@ public class Window {
 					east.add(button[i], BorderLayout.NORTH);
 				if(i%3 == 2)
 					east.add(button[i], BorderLayout.SOUTH);
-			} else if(i > 10 && i < 19) {
-				north.add(button[i]);
+			} else if(i == 18) {
+				for(int j = 18; j > 10; j--)
+					north.add(button[j]);
 			} else {
 				if(i%3 == 0)
 					west.add(button[i], BorderLayout.SOUTH);
@@ -98,13 +94,9 @@ public class Window {
 			
 		}
 		
-		//System.out.println(button[5].getSize());
-		
 		window.getContentPane().add(south, BorderLayout.SOUTH);
-		//east.add(Box.createHorizontalStrut(10), BorderLayout.EAST);
 		window.getContentPane().add(east, BorderLayout.EAST);
 		window.getContentPane().add(north, BorderLayout.NORTH);
-		//west.add(Box.createRigidArea(new Dimension(5,0)), BorderLayout.WEST);
 		window.getContentPane().add(west, BorderLayout.WEST);
 		
 		window.setVisible(true);
