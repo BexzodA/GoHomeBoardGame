@@ -14,6 +14,7 @@ public class PlayerSelecter extends JPanel{
 	private JLabel label;
 	private JTextField textField;
 	private JButton pickColor;
+	private String playerName;
 	private Color playerColor;
 	
 	public PlayerSelecter() {
@@ -23,6 +24,12 @@ public class PlayerSelecter extends JPanel{
 		textField.setMinimumSize(new Dimension(60,20));
 		textField.setPreferredSize(new Dimension(60,20));
 		textField.setMaximumSize(new Dimension(60,20));
+		
+		textField.addActionListener((e)->
+		{;
+			playerName = textField.getText();
+			System.out.println(playerName);
+		});
 		
 		pickColor = new JButton("Pick Color");
 		pickColor.setFocusable(false);
@@ -43,6 +50,10 @@ public class PlayerSelecter extends JPanel{
 	
 	public Color getPlayerColor() {
 		return playerColor;
+	}
+	
+	public Player generatePlayer() {
+		return new Player(playerName, playerColor);
 	}
 	
 }
