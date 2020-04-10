@@ -15,7 +15,7 @@ public class PlayerSelecter extends JPanel{
 	private JTextField textField;
 	private JButton pickColor;
 	private String playerName = "No Name";
-	private Color playerColor = Color.RED;
+	private Color playerColor = Color.BLACK;
 	
 	public PlayerSelecter() {
 		label = new JLabel("Enter Player Name: ");

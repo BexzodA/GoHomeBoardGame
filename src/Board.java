@@ -76,15 +76,11 @@ public class Board extends JPanel{
 		slots = new BoardSlot[22];
 		for (int i = 0; i < slots.length; i++) {
 			slots[i] = new BoardSlot(i + "");
+			
 			slots[i].setMinimumSize(new Dimension(162,138));
 			slots[i].setPreferredSize(new Dimension(162,138));
 			slots[i].setMaximumSize(new Dimension(162,138));
-			slots[i].addActionListener(
-					(e)->
-					{
-						this.setVisible(false);
-					}
-			);
+
 			if(i > -1 && i < 8)
 				south.add(slots[i]);
 			else if(i > 7 && i < 11) {
