@@ -117,6 +117,9 @@ public class PlayerCreationScreen extends JPanel{
 	}
 	
 	public ArrayList<PlayerSelecter> getPlayerSelecters(){
+		for(int i = selecters.size() - 1; i >= displayedAmount; i--) {
+			selecters.remove(i);
+		}
 		return selecters;
 	}
 	

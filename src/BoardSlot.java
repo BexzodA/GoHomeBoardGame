@@ -8,9 +8,9 @@ public class BoardSlot extends JButton {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private static final Color highlighColor = new Color(0,0,0);
-	private static final Color pressedColor = new Color(230,230,230);
-	private static final Color textColor = new Color(0,0,0);
+	private Color highlightColor = new Color(0,0,0);
+	private Color pressedColor = new Color(230,230,230);
+	private Color textColor = new Color(0,0,0);
 	
 	private ArrayList<Player> playersPresent = new ArrayList<Player>();
 	private Obstacle obstacle;
@@ -19,34 +19,38 @@ public class BoardSlot extends JButton {
 	private boolean isStart = false;
 	
 	public BoardSlot() {
-		this("");
-		initPlayerReferences();
+		
 	}
 	
 	public BoardSlot(String str) {
 		super(str);
-		setContentAreaFilled(false);
-		initPlayerReferences();
 	}
 	
-	public BoardSlot(Player[] players) {
-		initPlayerReferences();
+	public void addPlayer(Player player) {
+		playersPresent.add(player);
+		updateColor();
 	}
 	
-	public BoardSlot(Obstacle obstacle) {
-		initPlayerReferences();
-	}
-	
-	public void initPlayerReferences() {
-		for(int i = 0; i < Player.getNumOfPlayers(); i++) {
-			playersPresent.add(null);
+	public void updateColor() {
+		int r = 0, g = 0, b = 0;
+		
+		for(Player p : playersPresent) {
+			r += p.getColor().getRed();
+			g += p.getColor().getGreen();
+			b += p.getColor().getBlue();
 		}
+		
+		r /= playersPresent.size();
+		g /= playersPresent.size();
+		b /= playersPresent.size();
+		
+		highlightColor = new Color(r,g,b);
 	}
 	
 	@Override
 	public void paintComponent(Graphics gfx) {
 		if(getModel().isRollover()) {
-			gfx.setColor(highlighColor);
+			gfx.setColor(highlightColor);
 			gfx.drawRect(2, 2, getWidth() - 5, getHeight() - 5);
 		}
 		if(getModel().isPressed()) {
@@ -59,7 +63,7 @@ public class BoardSlot extends JButton {
 
 	@Override
 	public void paintBorder(Graphics gfx) {
-		gfx.setColor(highlighColor);
+		gfx.setColor(highlightColor);
 		gfx.drawRect(1, 1, getWidth() - 3, getHeight() - 3);
 	}
 	

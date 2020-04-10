@@ -23,4 +23,12 @@ public class Player implements Moveable{
 			
 	}
 	
+	public String getName() {
+		return playerName;
+	}
+	
+	public Color getColor() {
+		return playerColor;
+	}
+	
 }

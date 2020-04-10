@@ -14,8 +14,8 @@ public class PlayerSelecter extends JPanel{
 	private JLabel label;
 	private JTextField textField;
 	private JButton pickColor;
-	private String playerName;
-	private Color playerColor;
+	private String playerName = "No Name";
+	private Color playerColor = Color.RED;
 	
 	public PlayerSelecter() {
 		label = new JLabel("Enter Player Name: ");
@@ -53,6 +53,7 @@ public class PlayerSelecter extends JPanel{
 	}
 	
 	public Player generatePlayer() {
+		playerName = textField.getText();
 		return new Player(playerName, playerColor);
 	}
 	

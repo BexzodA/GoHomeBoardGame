@@ -2,7 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import javax.swing.JButton;
+import java.util.ArrayList;
 import javax.swing.JPanel;
 
 public class Board extends JPanel{
@@ -10,8 +10,9 @@ public class Board extends JPanel{
 	private static final long serialVersionUID = 134606650518445714L;
 	
 	private JPanel south, west, north, east;
+	private BoardSlot slots [];
 	
-	public Board() {
+	public Board(ArrayList<PlayerSelecter> playerConfigs) {
 		super();
 		this.setLayout(new BorderLayout());
 		((BorderLayout)this.getLayout()).setVgap(-1);
@@ -21,7 +22,11 @@ public class Board extends JPanel{
 		
 		initPanels();
 		initSlots();
-		addComponents();	
+		addComponents();
+		
+		for(PlayerSelecter e : playerConfigs) {
+			slots[0].addPlayer(e.generatePlayer());
+		}
 	}
 	
 	private void initPanels() {
@@ -68,37 +73,37 @@ public class Board extends JPanel{
 	}
 	
 	private void initSlots() {
-		JButton button [] = new JButton[22];
-		for (int i = 0; i < button.length; i++) {
-			button[i] = new BoardSlot(i + "");
-			button[i].setMinimumSize(new Dimension(162,138));
-			button[i].setPreferredSize(new Dimension(162,138));
-			button[i].setMaximumSize(new Dimension(162,138));
-			button[i].addActionListener(
+		slots = new BoardSlot[22];
+		for (int i = 0; i < slots.length; i++) {
+			slots[i] = new BoardSlot(i + "");
+			slots[i].setMinimumSize(new Dimension(162,138));
+			slots[i].setPreferredSize(new Dimension(162,138));
+			slots[i].setMaximumSize(new Dimension(162,138));
+			slots[i].addActionListener(
 					(e)->
 					{
 						this.setVisible(false);
 					}
 			);
 			if(i > -1 && i < 8)
-				south.add(button[i]);
+				south.add(slots[i]);
 			else if(i > 7 && i < 11) {
 				if(i%3 == 0)
-					east.add(button[i], BorderLayout.CENTER);
+					east.add(slots[i], BorderLayout.CENTER);
 				if(i%3 == 1)
-					east.add(button[i], BorderLayout.NORTH);
+					east.add(slots[i], BorderLayout.NORTH);
 				if(i%3 == 2)
-					east.add(button[i], BorderLayout.SOUTH);
+					east.add(slots[i], BorderLayout.SOUTH);
 			} else if(i == 18) {
 				for(int j = 18; j > 10; j--)
-					north.add(button[j]);
+					north.add(slots[j]);
 			} else {
 				if(i%3 == 0)
-					west.add(button[i], BorderLayout.SOUTH);
+					west.add(slots[i], BorderLayout.SOUTH);
 				if(i%3 == 1)
-					west.add(button[i], BorderLayout.NORTH);
+					west.add(slots[i], BorderLayout.NORTH);
 				if(i%3 == 2)
-					west.add(button[i], BorderLayout.CENTER);
+					west.add(slots[i], BorderLayout.CENTER);
 			}
 		}
 	}

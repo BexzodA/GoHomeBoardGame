@@ -18,7 +18,6 @@ public class Window {
 		window.getContentPane().setBackground(new Color(255,255,255));
 		
 		pcs = new PlayerCreationScreen(this);
-		gameBoard = new Board();
 		
 		window.getContentPane().add(pcs);
 		
@@ -27,6 +26,7 @@ public class Window {
 	
 	public void switchToBoard() {
 		window.getContentPane().remove(pcs);
+		gameBoard = new Board(pcs.getPlayerSelecters());
 		window.getContentPane().add(gameBoard);
 		((JPanel)window.getContentPane()).updateUI();
 	}
