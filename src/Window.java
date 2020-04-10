@@ -1,11 +1,12 @@
 import java.awt.Color;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class Window {
 	
 	private JFrame window;
+	private PlayerCreationScreen pcs;
 	private Board gameBoard;
-	//private JPanel south, west, north, east;
 	
 	public Window(String name, int width, int height) {
 		window = new JFrame(name);
@@ -16,11 +17,18 @@ public class Window {
 		
 		window.getContentPane().setBackground(new Color(255,255,255));
 		
+		pcs = new PlayerCreationScreen(this);
 		gameBoard = new Board();
 		
-		window.add(gameBoard);
+		window.getContentPane().add(pcs);
 		
 		window.setVisible(true);
+	}
+	
+	public void switchToBoard() {
+		window.getContentPane().remove(pcs);
+		window.getContentPane().add(gameBoard);
+		((JPanel)window.getContentPane()).updateUI();
 	}
 	
 }

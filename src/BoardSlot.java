@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 
@@ -11,13 +12,35 @@ public class BoardSlot extends JButton {
 	private static final Color pressedColor = new Color(230,230,230);
 	private static final Color textColor = new Color(0,0,0);
 	
+	private ArrayList<Player> playersPresent = new ArrayList<Player>();
+	private Obstacle obstacle;
+	
+	private boolean isHome = false;
+	private boolean isStart = false;
+	
 	public BoardSlot() {
-		this(null);
+		this("");
+		initPlayerReferences();
 	}
 	
 	public BoardSlot(String str) {
 		super(str);
 		setContentAreaFilled(false);
+		initPlayerReferences();
+	}
+	
+	public BoardSlot(Player[] players) {
+		initPlayerReferences();
+	}
+	
+	public BoardSlot(Obstacle obstacle) {
+		initPlayerReferences();
+	}
+	
+	public void initPlayerReferences() {
+		for(int i = 0; i < Player.getNumOfPlayers(); i++) {
+			playersPresent.add(null);
+		}
 	}
 	
 	@Override

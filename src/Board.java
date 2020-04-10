@@ -12,7 +12,7 @@ public class Board extends JPanel{
 	private JPanel south, west, north, east;
 	
 	public Board() {
-		
+		super();
 		this.setLayout(new BorderLayout());
 		((BorderLayout)this.getLayout()).setVgap(-1);
 		
