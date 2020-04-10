@@ -59,10 +59,11 @@ public class BoardSlot extends JButton {
 			gfx.setColor(pressedColor);
 			gfx.fillRect(3, 3, getWidth() - 6, getHeight() - 6);
 		} else {
-			gfx.clearRect(0, 0, getWidth(), getHeight());
+			gfx.clearRect(3, 3, getWidth() - 6, getHeight() - 6);
 		}
 		gfx.setColor(textColor);
 		gfx.drawChars(getText().toCharArray(), 0, getText().length(), getWidth()/2, getHeight()/2);
+		System.out.println(getModel().isRollover());
 	}
 
 	@Override
