@@ -33,12 +33,17 @@ public class BoardSlot extends JButton{
 	
 	private State slotState = State.EMPTY;
 	
-	public BoardSlot() {
-		this("");
+	private int index;
+	
+	public BoardSlot(int index) {
+		this("", index);
 	}
 	
-	public BoardSlot(String str) {
+	public BoardSlot(String str, int index) {
 		super(str);
+		
+		this.index = index;
+		
 		this.setFont(new Font(this.getFont().getName(), Font.BOLD, 10));
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
@@ -49,10 +54,33 @@ public class BoardSlot extends JButton{
 		calculateFontSize();
 	}
 	
+	public int getIndex() {
+		return index;
+	}
+	
 	public void addPlayer(Player player) {
 		playersPresent.add(player);
 		updateColor();
 		playerIsPresent = true;
+	}
+	
+	public void removePlayer(Player player) {
+		if(playersPresent.remove(player) && playersPresent.size() == 0) {
+			playerIsPresent = false;
+		}
+	}
+	
+	public boolean hasObstacle() {
+		return slotState == State.OBSTACLE;
+	}
+	
+	public Obstacle getObstacle() {
+		if(slotState == State.OBSTACLE) {
+			return obstacle;
+		} else {
+			System.err.println("ERROR: SLOT DOES NOT HAVE OBSTACLE! RETURN NULL!");
+			return obstacle;
+		}
 	}
 	
 	public void updateColor() {

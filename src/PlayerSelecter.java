@@ -55,9 +55,9 @@ public class PlayerSelecter extends JPanel{
 		return playerColor;
 	}
 	
-	public Player generatePlayer() {
+	public Player generatePlayer(BoardSlot location) {
 		playerName = textField.getText();
-		return new Player(playerName, playerColor);
+		return new Player(playerName, playerColor, location);
 	}
 	
 }

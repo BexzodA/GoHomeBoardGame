@@ -8,10 +8,20 @@ public class Player implements Moveable{
 	
 	private final String playerName;
 	private final Color playerColor;
+	private BoardSlot location;
 	
-	public Player(String playerName, Color playerColor) {
+	public Player(String playerName, Color playerColor, BoardSlot location) {
 		this.playerName = playerName;
 		this.playerColor = playerColor;
+		this.location = location;
+	}
+	
+	public BoardSlot getLocation() {
+		return location;
+	}
+	
+	public void updateLocation(BoardSlot newLoc) {
+		location = newLoc;
 	}
 	
 	public static int getNumOfPlayers() {

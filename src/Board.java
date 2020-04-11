@@ -3,12 +3,12 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
+import java.util.Stack;
 
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 public class Board extends JPanel {
@@ -17,7 +17,10 @@ public class Board extends JPanel {
 	
 	private BoardSlot slots [];
 	
-	private ArrayList<BoardSlot> playerLocations;
+	private ArrayList<Player> players;
+	private Stack<Player> turns;
+	
+	private static final int PLAYER_MOVE_TIME = 500;
 	
 	public Board(ArrayList<PlayerSelecter> playerConfigs) {
 		super();
@@ -26,26 +29,93 @@ public class Board extends JPanel {
 		this.setOpaque(true);
 		this.setBackground(new Color(255,255,255));
 		
-		playerLocations = new ArrayList<BoardSlot>();
+		players = new ArrayList<Player>();
+		turns = new Stack<Player>();
 		
 		initSlots();
 		addObstacles();
 		addComponents();
 		
 		for(PlayerSelecter e : playerConfigs) {
-			slots[0].addPlayer(e.generatePlayer());
+			Player player = e.generatePlayer(slots[0]);
+			slots[0].addPlayer(player);
+			players.add(player);
 		}
 		
-		playerLocations.add(slots[0]);
+		Collections.shuffle(players);
+		
+		for(Player e : players) {
+			turns.push(e);
+		}
 		
 		slots[0].setAsStart();
 		slots[21].setAsHome();
+		
+		moveFowardPlayer(turns.pop(), 3);
+	}
+	
+	private synchronized void moveFowardPlayer(Player player, int amount) {
+		Thread moveFoward = new Thread(
+				() ->
+				{
+					for(int i = 0; i < amount; i++) {
+						BoardSlot location = player.getLocation();
+						location.removePlayer(player);
+						slots[location.getIndex() + 1].addPlayer(player);
+						
+						location.repaint();
+						slots[location.getIndex() + 1].repaint();
+						
+						player.updateLocation(slots[location.getIndex() + 1]);
+						
+						try {
+							Thread.sleep(PLAYER_MOVE_TIME);
+						} catch(InterruptedException e) {
+							e.printStackTrace();
+						}	
+						
+						if(slots[location.getIndex() + 1].hasObstacle()) {
+							moveBackPlayer(player, slots[location.getIndex() + 1].getObstacle().getSpacesToMove());
+							return;
+						}
+					}
+				}
+		);
+		moveFoward.start();
+	}
+	
+	private synchronized void moveBackPlayer(Player player, int amount) {
+		Thread moveBackward = new Thread(
+				() ->{
+					for(int i = 0; i < amount; i++) {
+						BoardSlot location = player.getLocation();
+						
+						if(location.getIndex() == 0) {
+							return;
+						}
+						
+						location.removePlayer(player);
+						slots[location.getIndex() - 1].addPlayer(player);
+						
+						location.repaint();
+						slots[location.getIndex() - 1].repaint();
+						
+						player.updateLocation(slots[location.getIndex() - 1]);
+						try {
+							Thread.sleep(PLAYER_MOVE_TIME);
+						} catch(InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+		);
+		moveBackward.start();
 	}
 	
 	private void initSlots() {
 		slots = new BoardSlot[22];
 		for (int i = 0; i < slots.length; i++) {
-			slots[i] = new BoardSlot();
+			slots[i] = new BoardSlot(i);
 		}	
 	}
 	
