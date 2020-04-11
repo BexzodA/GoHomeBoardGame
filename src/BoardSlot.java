@@ -11,6 +11,13 @@ import javax.swing.JButton;
 
 public class BoardSlot extends JButton{
 	
+	private enum State{
+		START,
+		EMPTY,
+		OBSTACLE,
+		HOME;
+	}
+	
 	private static final long serialVersionUID = 1L;
 	
 	private Color highlightColor = new Color(0,0,0);
@@ -20,12 +27,11 @@ public class BoardSlot extends JButton{
 	private ArrayList<Player> playersPresent = new ArrayList<Player>();
 	private Obstacle obstacle;
 	
-	private boolean isHome = false;
-	private boolean isStart = false;
 	private boolean playerIsPresent = false;
-	private boolean hasObstacle = false;
 	
 	private static final float fontScaleFactor = 160.f;
+	
+	private State slotState = State.EMPTY;
 	
 	public BoardSlot() {
 		this("");
@@ -45,7 +51,7 @@ public class BoardSlot extends JButton{
 	
 	public void addObstacle(Obstacle obs) {
 		obstacle = obs;
-		hasObstacle = true;
+		slotState = State.OBSTACLE;
 	}
 	
 	public void addPlayer(Player player) {
@@ -72,6 +78,22 @@ public class BoardSlot extends JButton{
 	
 	private void calculateFontSize() {
 		this.setFont(new Font(this.getFont().getName(), Font.BOLD, (int)((Window.getWidth() + Window.getHeight()) / fontScaleFactor)));
+	}
+	
+	public void setAsStart() {
+		if(slotState == State.EMPTY) {
+			slotState = State.START;
+		}
+		else
+			System.err.println("Attempted to change the state of a slot more than once");
+	}
+	
+	public void setAsHome() {
+		if(slotState == State.EMPTY) {
+			slotState = State.HOME;
+		}
+		else
+			System.err.println("Attempted to change the state of a slot more than once");
 	}
 	
 	@Override
@@ -103,14 +125,19 @@ public class BoardSlot extends JButton{
 			}
 		}
 		
-		if(hasObstacle) {
-			ImageIcon icon = new ImageIcon(".//src//assets//obstacle.png");
-			Image image = icon.getImage();
-			gfx.drawImage(image, 32, 16, getWidth() - 64, getHeight() - 32, null);
-			gfx.setColor(Color.GREEN);
-			//gfx.setFont(new Font(gfx.getFont().getName(), Font.BOLD, 16));
-			int xOffSet = gfx.getFontMetrics().charWidth(obstacle.getSpacesToMove() + 48) / 2;
-			gfx.drawString(obstacle.getSpacesToMove() + "", getWidth()/2 - xOffSet, getHeight()/2 - 2);
+		switch(slotState) {
+			case OBSTACLE :
+					ImageIcon icon = new ImageIcon(".//src//assets//obstacle.png");
+					Image image = icon.getImage();
+					gfx.drawImage(image, 32, 16, getWidth() - 64, getHeight() - 32, null);
+					gfx.setColor(Color.GREEN);
+					int xOffSet = gfx.getFontMetrics().charWidth(obstacle.getSpacesToMove() + 48) / 2;
+					gfx.drawString(obstacle.getSpacesToMove() + "", getWidth()/2 - xOffSet, getHeight()/2 - getHeight()/50);
+					break;
+			case START :
+					gfx.setColor(Color.CYAN);
+					gfx.drawString("START!", getWidth()/2 - 6 * gfx.getFontMetrics().charWidth('T') / 2, getHeight()/4);
+					break;
 		}
 	}
 	

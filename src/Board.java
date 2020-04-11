@@ -38,6 +38,7 @@ public class Board extends JPanel {
 		
 		playerLocations.add(slots[0]);
 		
+		slots[0].setAsStart();
 	}
 	
 	private void initSlots() {
@@ -49,10 +50,12 @@ public class Board extends JPanel {
 	
 	private void addComponents() {
 		int x = 0;
+		
 		for (int i = 18; i > 10; i--) {
 			placeComp(slots[i], this, x, 0, 1, 1);
 			x++;
 		}
+		
 		placeComp(slots[19], this, 0, 1, 1, 1);
 		placeComp(slots[10], this, 7, 1, 1, 1);
 		
@@ -85,7 +88,7 @@ public class Board extends JPanel {
 		int takenLocations [] = new int [6];
 		int size = 0;
 		for(int i = 0; i < 6; i++) {
-			int location = rng.nextInt(21)+1;
+			int location = rng.nextInt(20)+1;
 			for (int j = 0; j < size; j++) {
 				if(location == takenLocations[j]) {
 					location = rng.nextInt(21)+1;

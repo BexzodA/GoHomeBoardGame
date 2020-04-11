@@ -41,6 +41,10 @@ public class PlayerSelecter extends JPanel{
 		addComponents();
 	}
 	
+	public void setText(String str) {
+		textField.setText(str);
+	}
+	
 	public void addComponents() {
 		this.add(label);
 		this.add(textField);

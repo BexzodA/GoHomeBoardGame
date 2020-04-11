@@ -104,6 +104,7 @@ public class PlayerCreationScreen extends JPanel{
 	public void addPlayerSelecters() {	
 		for(int i = 0; i < Player.MAX_NUM_OF_PLAYERS; i++) {
 			PlayerSelecter player = new PlayerSelecter();
+			player.setText("Player" + " " + (i + 1));
 			selecters.add(player);
 			contentPanel.add(player);
 		}
