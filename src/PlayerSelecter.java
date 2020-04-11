@@ -23,7 +23,6 @@ public class PlayerSelecter extends JPanel{
 		
 		textField.setMinimumSize(new Dimension(60,20));
 		textField.setPreferredSize(new Dimension(60,20));
-		textField.setMaximumSize(new Dimension(60,20));
 		
 		textField.addActionListener((e)->
 		{;

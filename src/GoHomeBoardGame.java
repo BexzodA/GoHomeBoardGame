@@ -7,7 +7,7 @@ public class GoHomeBoardGame {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			SwingUtilities.invokeLater(()->{
-				new Window("GoHomeBoardGame", 1295, 720);
+				new Window("GoHomeBoardGame", 1280, 720);
 			});
 		} catch (Exception e) {
 			e.printStackTrace();

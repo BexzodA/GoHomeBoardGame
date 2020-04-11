@@ -75,8 +75,6 @@ public class PlayerCreationScreen extends JPanel{
 	private void addComponents() {
 		this.add(title, BorderLayout.NORTH);
 		this.add(Box.createVerticalStrut(75), BorderLayout.SOUTH);
-		this.add(Box.createHorizontalStrut(350), BorderLayout.EAST);
-		this.add(Box.createHorizontalStrut(350), BorderLayout.WEST);
 		this.add(contentPanel, BorderLayout.CENTER);
 	}
 	

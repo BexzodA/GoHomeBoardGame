@@ -1,4 +1,8 @@
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -8,10 +12,20 @@ public class Window {
 	private PlayerCreationScreen pcs;
 	private Board gameBoard;
 	
+	private static float width;
+	private static float height;
+	
 	public Window(String name, int width, int height) {
 		window = new JFrame(name);
-		window.setSize(width, height);
-		window.setResizable(false);
+		
+		window.setMinimumSize(new Dimension(1280, 720));
+		window.setPreferredSize(new Dimension(1920, 1080));
+		
+		window.setSize(new Dimension(width, height));
+		
+		Window.width = width;
+		Window.height = height;
+		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setLocationRelativeTo(null);
 		
@@ -20,6 +34,14 @@ public class Window {
 		pcs = new PlayerCreationScreen(this);
 		
 		window.getContentPane().add(pcs);
+		
+		window.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				Window.width = window.getWidth();
+				Window.height = window.getHeight();
+			}
+		});
 		
 		window.setVisible(true);
 	}
@@ -31,4 +53,15 @@ public class Window {
 		((JPanel)window.getContentPane()).updateUI();
 	}
 	
+	public static float getScreenRatio() {
+		return width/height;
+	}
+	
+	public static float getWidth() {
+		return width;
+	}
+	
+	public static float getHeight() {
+		return height;
+	}
 }
