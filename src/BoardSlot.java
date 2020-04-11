@@ -25,6 +25,8 @@ public class BoardSlot extends JButton{
 	private boolean playerIsPresent = false;
 	private boolean hasObstacle = false;
 	
+	private static final float fontScaleFactor = 160.f;
+	
 	public BoardSlot() {
 		this("");
 	}
@@ -41,8 +43,9 @@ public class BoardSlot extends JButton{
 		calculateFontSize();
 	}
 	
-	public void setObstacle(boolean obs) {
-		hasObstacle = obs;
+	public void addObstacle(Obstacle obs) {
+		obstacle = obs;
+		hasObstacle = true;
 	}
 	
 	public void addPlayer(Player player) {
@@ -68,7 +71,7 @@ public class BoardSlot extends JButton{
 	}
 	
 	private void calculateFontSize() {
-		this.setFont(new Font(this.getFont().getName(), Font.BOLD, (int)((Window.getWidth() + Window.getHeight()) / 160.0f)));
+		this.setFont(new Font(this.getFont().getName(), Font.BOLD, (int)((Window.getWidth() + Window.getHeight()) / fontScaleFactor)));
 	}
 	
 	@Override
@@ -104,6 +107,10 @@ public class BoardSlot extends JButton{
 			ImageIcon icon = new ImageIcon(".//src//assets//obstacle.png");
 			Image image = icon.getImage();
 			gfx.drawImage(image, 32, 16, getWidth() - 64, getHeight() - 32, null);
+			gfx.setColor(Color.GREEN);
+			//gfx.setFont(new Font(gfx.getFont().getName(), Font.BOLD, 16));
+			int xOffSet = gfx.getFontMetrics().charWidth(obstacle.getSpacesToMove() + 48) / 2;
+			gfx.drawString(obstacle.getSpacesToMove() + "", getWidth()/2 - xOffSet, getHeight()/2 - 2);
 		}
 	}
 	

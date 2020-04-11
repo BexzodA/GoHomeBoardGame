@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -28,8 +29,7 @@ public class Board extends JPanel {
 		playerLocations = new ArrayList<BoardSlot>();
 		
 		initSlots();
-		//slots[2].setIcon(new ImageIcon(".//src//assets//obstacle32.png"));
-		slots[2].setObstacle(true);
+		addObstacles();
 		addComponents();
 		
 		for(PlayerSelecter e : playerConfigs) {
@@ -78,5 +78,23 @@ public class Board extends JPanel {
 		    cons.weightx = 1.0f;
 		    cons.weighty = 1.0f;
 		    panel.add(comp, cons);
+	}
+	 
+	public void addObstacles() {
+		Random rng = new Random();
+		int takenLocations [] = new int [6];
+		int size = 0;
+		for(int i = 0; i < 6; i++) {
+			int location = rng.nextInt(21)+1;
+			for (int j = 0; j < size; j++) {
+				if(location == takenLocations[j]) {
+					location = rng.nextInt(21)+1;
+					j--;
+				}
+			}
+			slots[location].addObstacle(new Obstacle(rng.nextInt(4)+1));
+			takenLocations[i] = location;
+			size++;
+		}
 	}
 }
