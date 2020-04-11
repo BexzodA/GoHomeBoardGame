@@ -49,11 +49,6 @@ public class BoardSlot extends JButton{
 		calculateFontSize();
 	}
 	
-	public void addObstacle(Obstacle obs) {
-		obstacle = obs;
-		slotState = State.OBSTACLE;
-	}
-	
 	public void addPlayer(Player player) {
 		playersPresent.add(player);
 		updateColor();
@@ -78,6 +73,11 @@ public class BoardSlot extends JButton{
 	
 	private void calculateFontSize() {
 		this.setFont(new Font(this.getFont().getName(), Font.BOLD, (int)((Window.getWidth() + Window.getHeight()) / fontScaleFactor)));
+	}
+	
+	public void addObstacle(Obstacle obs) {
+		obstacle = obs;
+		slotState = State.OBSTACLE;
 	}
 	
 	public void setAsStart() {
@@ -108,6 +108,7 @@ public class BoardSlot extends JButton{
 			gfx.fillRect(3, 3, getWidth() - 6, getHeight() - 6);
 		}
 		gfx.setColor(textColor);
+		
 		if(playerIsPresent) {		
 			int yOffSet = 0;
 			int greatestLength = 0;
@@ -120,24 +121,56 @@ public class BoardSlot extends JButton{
 			
 			for(Player p : playersPresent) {
 				gfx.setColor(p.getColor());
-				gfx.drawString(p.getName(), getWidth()/2 - greatestLength * gfx.getFontMetrics().charWidth('a') / 2, getHeight()/2 + yOffSet * gfx.getFontMetrics().getHeight());
+				gfx.drawString(p.getName(), getWidth() / 2 - (greatestLength - 1) * gfx.getFontMetrics().charWidth('a') / 2, getHeight()/2 + yOffSet * gfx.getFontMetrics().getHeight());
 				yOffSet += 1;
 			}
 		}
 		
 		switch(slotState) {
-			case OBSTACLE :
+			case EMPTY :
+					break;
+			case OBSTACLE : {
 					ImageIcon icon = new ImageIcon(".//src//assets//obstacle.png");
 					Image image = icon.getImage();
 					gfx.drawImage(image, 32, 16, getWidth() - 64, getHeight() - 32, null);
-					gfx.setColor(Color.GREEN);
+					
+					gfx.setColor(Color.BLACK);
 					int xOffSet = gfx.getFontMetrics().charWidth(obstacle.getSpacesToMove() + 48) / 2;
 					gfx.drawString(obstacle.getSpacesToMove() + "", getWidth()/2 - xOffSet, getHeight()/2 - getHeight()/50);
 					break;
-			case START :
-					gfx.setColor(Color.CYAN);
+					
+			}
+			case START : {
+					gfx.setColor(Color.GREEN);
 					gfx.drawString("START!", getWidth()/2 - 6 * gfx.getFontMetrics().charWidth('T') / 2, getHeight()/4);
+					gfx.setColor(Color.GREEN);
+					
+					int thickness = (int)((Window.getWidth() + Window.getHeight()) / 200.0f);
+					
+					//Upper Wing
+					for(int i = 0; i < thickness / 2; i++) 
+						gfx.drawLine(getWidth() / 2 - i, (int)(getHeight() / 3.5f) - 1, getWidth() / 2 + 6 * gfx.getFontMetrics().charWidth('T') / 2 - i, getHeight() / 3 - 1);
+
+					//Arrow main body
+					for(int i = 1; i < thickness / 8 + 1; i++)
+						gfx.drawLine(getWidth() / 2 - 6 * gfx.getFontMetrics().charWidth('T') / 2, getHeight() / 3 + i, getWidth() / 2 + 6 * gfx.getFontMetrics().charWidth('T') / 2, getHeight() / 3 + i);
+					gfx.drawLine(getWidth() / 2 - 6 * gfx.getFontMetrics().charWidth('T') / 2, getHeight() / 3, getWidth() / 2 + 6 * gfx.getFontMetrics().charWidth('T') / 2, getHeight() / 3);
+					
+					for(int i = 1; i < thickness / 8 + 1; i++)
+					gfx.drawLine(getWidth() / 2 - 6 * gfx.getFontMetrics().charWidth('T') / 2, getHeight() / 3 - i, getWidth() / 2 + 6 * gfx.getFontMetrics().charWidth('T') / 2, getHeight() / 3 - i);
+					
+					//Lower Wing
+					for(int i = 0; i < thickness / 2; i++)
+						gfx.drawLine(getWidth() / 2 - i, (int)(getHeight() / 2.5f) + 1, getWidth() / 2 + 6 * gfx.getFontMetrics().charWidth('T') / 2 - i, getHeight() / 3 + 1);
+					
 					break;
+			}
+			case HOME : {
+					ImageIcon icon = new ImageIcon(".//src//assets//Home.png");
+					Image image = icon.getImage();
+					gfx.drawImage(image, 32, 16, getWidth() - 64, getHeight() - 32, null);
+					break;
+			}
 		}
 	}
 	

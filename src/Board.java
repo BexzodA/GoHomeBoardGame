@@ -39,6 +39,7 @@ public class Board extends JPanel {
 		playerLocations.add(slots[0]);
 		
 		slots[0].setAsStart();
+		slots[21].setAsHome();
 	}
 	
 	private void initSlots() {
@@ -91,7 +92,7 @@ public class Board extends JPanel {
 			int location = rng.nextInt(20)+1;
 			for (int j = 0; j < size; j++) {
 				if(location == takenLocations[j]) {
-					location = rng.nextInt(21)+1;
+					location = rng.nextInt(20)+1;
 					j--;
 				}
 			}
