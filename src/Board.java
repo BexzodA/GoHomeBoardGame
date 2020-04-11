@@ -3,9 +3,11 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 public class Board extends JPanel {
@@ -26,6 +28,8 @@ public class Board extends JPanel {
 		playerLocations = new ArrayList<BoardSlot>();
 		
 		initSlots();
+		//slots[2].setIcon(new ImageIcon(".//src//assets//obstacle32.png"));
+		slots[2].setObstacle(true);
 		addComponents();
 		
 		for(PlayerSelecter e : playerConfigs) {
@@ -33,12 +37,13 @@ public class Board extends JPanel {
 		}
 		
 		playerLocations.add(slots[0]);
+		
 	}
 	
 	private void initSlots() {
 		slots = new BoardSlot[22];
 		for (int i = 0; i < slots.length; i++) {
-			slots[i] = new BoardSlot(i + "");
+			slots[i] = new BoardSlot();
 		}	
 	}
 	

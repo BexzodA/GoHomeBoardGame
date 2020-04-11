@@ -1,10 +1,12 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 public class BoardSlot extends JButton{
@@ -21,6 +23,7 @@ public class BoardSlot extends JButton{
 	private boolean isHome = false;
 	private boolean isStart = false;
 	private boolean playerIsPresent = false;
+	private boolean hasObstacle = false;
 	
 	public BoardSlot() {
 		this("");
@@ -32,11 +35,14 @@ public class BoardSlot extends JButton{
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				System.out.println("TEST");
 				calculateFontSize();
 			}
 		});
 		calculateFontSize();
+	}
+	
+	public void setObstacle(boolean obs) {
+		hasObstacle = obs;
 	}
 	
 	public void addPlayer(Player player) {
@@ -77,8 +83,7 @@ public class BoardSlot extends JButton{
 			gfx.fillRect(3, 3, getWidth() - 6, getHeight() - 6);
 		}
 		gfx.setColor(textColor);
-		if(playerIsPresent) {
-			
+		if(playerIsPresent) {		
 			int yOffSet = 0;
 			int greatestLength = 0;
 			
@@ -89,9 +94,16 @@ public class BoardSlot extends JButton{
 			}
 			
 			for(Player p : playersPresent) {
+				gfx.setColor(p.getColor());
 				gfx.drawString(p.getName(), getWidth()/2 - greatestLength * gfx.getFontMetrics().charWidth('a') / 2, getHeight()/2 + yOffSet * gfx.getFontMetrics().getHeight());
 				yOffSet += 1;
 			}
+		}
+		
+		if(hasObstacle) {
+			ImageIcon icon = new ImageIcon(".//src//assets//obstacle.png");
+			Image image = icon.getImage();
+			gfx.drawImage(image, 32, 16, getWidth() - 64, getHeight() - 32, null);
 		}
 	}
 	
@@ -104,4 +116,5 @@ public class BoardSlot extends JButton{
 			gfx.drawRect(2, 2, getWidth() - 5, getHeight() - 5);
 		}
 	}
+	
 }

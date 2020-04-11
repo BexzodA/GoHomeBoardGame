@@ -2,7 +2,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 public class GoHomeBoardGame {
-	
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -12,6 +11,5 @@ public class GoHomeBoardGame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
+	}	
 }
