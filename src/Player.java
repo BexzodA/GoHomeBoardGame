@@ -24,6 +24,10 @@ public class Player implements Moveable{
 		location = newLoc;
 	}
 	
+	public void getCurPlayer() {
+		
+	}
+	
 	public static int getNumOfPlayers() {
 		return numOfPlayers;
 	}

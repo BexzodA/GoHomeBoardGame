@@ -28,9 +28,7 @@ public class Window {
 		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setLocationRelativeTo(null);
-		
-		window.getContentPane().setBackground(new Color(255,255,255));
-		
+				
 		pcs = new PlayerCreationScreen(this);
 		
 		window.getContentPane().add(pcs);

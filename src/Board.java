@@ -1,6 +1,9 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,32 +12,43 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.Stack;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class Board extends JPanel {
 	
 	private static final long serialVersionUID = 134606650518445714L;
 	
 	private BoardSlot slots [];
+	private JLabel curPlayerTurn;
+	private JButton play;
+	private JButton autoPlay;
 	
 	private ArrayList<Player> players;
-	private Stack<Player> turns;
+	private Stack<Player> turnStack;
+	private Stack<Player> que;
 	
-	private static final int PLAYER_MOVE_TIME = 500;
+	private static final int PLAYER_MOVE_TIME = 1000;
+	
+	private Player currentPlayer;
+	private Deck deck;
+	
+	private boolean movingPlayer = false;
 	
 	public Board(ArrayList<PlayerSelecter> playerConfigs) {
 		super();
 		this.setLayout(new GridBagLayout());
 		
-		this.setOpaque(true);
-		this.setBackground(new Color(255,255,255));
+		deck = new Deck(this);
 		
 		players = new ArrayList<Player>();
-		turns = new Stack<Player>();
+		turnStack = new Stack<Player>();
+		que = new Stack<Player>();
 		
 		initSlots();
 		addObstacles();
-		addComponents();
 		
 		for(PlayerSelecter e : playerConfigs) {
 			Player player = e.generatePlayer(slots[0]);
@@ -45,13 +59,41 @@ public class Board extends JPanel {
 		Collections.shuffle(players);
 		
 		for(Player e : players) {
-			turns.push(e);
+			turnStack.push(e);
 		}
+		
+		currentPlayer = turnStack.peek();
+		
+		addUtilities();
+		addComponents();
+		
 		
 		slots[0].setAsStart();
 		slots[21].setAsHome();
 		
-		moveFowardPlayer(turns.pop(), 3);
+	}
+	
+	public Player getCurPlayer() {
+		return currentPlayer;
+	}
+	
+	public synchronized void moveCurrentPlayer(int amount) {
+		if(!movingPlayer) {
+			movingPlayer = true;
+			if(turnStack.isEmpty()) {
+				repopulateTurnStack();
+			}
+			Player player = turnStack.pop();
+			moveFowardPlayer(player, amount);
+			que.push(player);
+			if(turnStack.size() > 0) {
+				currentPlayer = turnStack.peek();
+			}
+			else {
+				repopulateTurnStack();
+				currentPlayer = turnStack.peek();
+			}
+		}
 	}
 	
 	private synchronized void moveFowardPlayer(Player player, int amount) {
@@ -60,6 +102,7 @@ public class Board extends JPanel {
 				{
 					for(int i = 0; i < amount; i++) {
 						BoardSlot location = player.getLocation();
+						
 						location.removePlayer(player);
 						slots[location.getIndex() + 1].addPlayer(player);
 						
@@ -67,6 +110,8 @@ public class Board extends JPanel {
 						slots[location.getIndex() + 1].repaint();
 						
 						player.updateLocation(slots[location.getIndex() + 1]);
+						location = player.getLocation();
+						
 						
 						try {
 							Thread.sleep(PLAYER_MOVE_TIME);
@@ -74,11 +119,14 @@ public class Board extends JPanel {
 							e.printStackTrace();
 						}	
 						
-						if(slots[location.getIndex() + 1].hasObstacle()) {
-							moveBackPlayer(player, slots[location.getIndex() + 1].getObstacle().getSpacesToMove());
+						if(slots[location.getIndex()].hasObstacle() && i == amount - 1) {
+							moveBackPlayer(player, slots[location.getIndex()].getObstacle().getSpacesToMove());
 							return;
 						}
+						
 					}
+					updateLabel();
+					movingPlayer = false;
 				}
 		);
 		moveFoward.start();
@@ -87,10 +135,13 @@ public class Board extends JPanel {
 	private synchronized void moveBackPlayer(Player player, int amount) {
 		Thread moveBackward = new Thread(
 				() ->{
-					for(int i = 0; i < amount; i++) {
+					int amountcopy = amount;
+					for(int i = 0; i < amountcopy; i++) {
 						BoardSlot location = player.getLocation();
 						
 						if(location.getIndex() == 0) {
+							updateLabel();
+							movingPlayer = false;
 							return;
 						}
 						
@@ -101,15 +152,31 @@ public class Board extends JPanel {
 						slots[location.getIndex() - 1].repaint();
 						
 						player.updateLocation(slots[location.getIndex() - 1]);
+						location = player.getLocation();
+						
+						if(location.hasObstacle() && i == amountcopy - 1) {
+							amountcopy += location.getObstacle().getSpacesToMove();
+						}
+						
 						try {
 							Thread.sleep(PLAYER_MOVE_TIME);
 						} catch(InterruptedException e) {
 							e.printStackTrace();
 						}
+						
 					}
+					updateLabel();
+					movingPlayer = false;
 				}
 		);
 		moveBackward.start();
+	}
+	
+	private void repopulateTurnStack() {
+		while(!que.empty()) {
+			Player p = que.pop();
+			turnStack.push(p);
+		}
 	}
 	
 	private void initSlots() {
@@ -141,7 +208,21 @@ public class Board extends JPanel {
 		}
 	}
 	
-	 public void placeComp(Component comp, Container panel, int x, int y, int w, int h) {
+	public void looseTurn() {
+		System.out.println("looseturn");
+	}
+	
+	private void updateLabel() {
+		curPlayerTurn.setText(currentPlayer.getName() + "'s Turn!");
+		curPlayerTurn.setForeground(currentPlayer.getColor());
+		deck.update();
+	}
+	
+	public void switchPlayer() {
+		System.out.println("switchplayers");
+	}
+	
+	public void placeComp(Component comp, Container panel, int x, int y, int w, int h) {
 		    GridBagConstraints cons = new GridBagConstraints();
 		    cons.gridx = x;
 		    cons.gridy = y;
@@ -153,6 +234,17 @@ public class Board extends JPanel {
 		    cons.weighty = 1.0f;
 		    panel.add(comp, cons);
 	}
+	
+	public void placeCompNotFill(Component comp, Container panel, int x, int y, int w, int h) {
+		    GridBagConstraints cons = new GridBagConstraints();
+		    cons.gridx = x;
+		    cons.gridy = y;
+		    cons.gridwidth = w;
+		    cons.gridheight = h;
+		    cons.weightx = 0.0f;
+		    cons.weighty = 0.0f;
+		    panel.add(comp, cons);
+	 }
 	 
 	public void addObstacles() {
 		Random rng = new Random();
@@ -171,4 +263,53 @@ public class Board extends JPanel {
 			size++;
 		}
 	}
+	
+	public void addUtilities() {
+		JPanel util = new JPanel();
+		
+		BorderLayout bl = new BorderLayout();
+		
+		util.setLayout(bl);
+		
+		curPlayerTurn = new JLabel(currentPlayer.getName() + "'s Turn!");
+		curPlayerTurn.setHorizontalAlignment(SwingConstants.CENTER);
+		curPlayerTurn.setVerticalAlignment(SwingConstants.BOTTOM);
+		curPlayerTurn.setForeground(currentPlayer.getColor());
+		curPlayerTurn.setFont(new Font(curPlayerTurn.getFont().getName(), Font.BOLD, getFontSize(60)));
+		
+		util.add(curPlayerTurn, BorderLayout.NORTH);
+		
+		deck.update();
+		
+		util.add(deck, BorderLayout.CENTER);	
+		
+		JPanel utilBts = new JPanel();
+		
+		FlowLayout fl = new FlowLayout();
+		utilBts.setLayout(fl);
+				
+		play = new JButton("Play");
+		play.addActionListener((e)->{
+			if(!movingPlayer) {
+				deck.drawCard().whenDrawn();;
+			}
+		});
+		play.setFocusable(false);
+		
+		utilBts.add(play);
+		
+		autoPlay = new JButton("Auto Play");
+		autoPlay.setFocusable(false);
+		
+		utilBts.add(autoPlay);
+		
+		util.add(utilBts, BorderLayout.SOUTH);
+		
+		placeCompNotFill(util, this, 1, 1, 6, 3);
+	}
+	
+	public static int getFontSize(float factor) {
+		return (int) ((Window.getHeight() + Window.getWidth()) / factor);
+	}
+	
 }

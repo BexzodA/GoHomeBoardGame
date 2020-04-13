@@ -20,9 +20,8 @@ public class BoardSlot extends JButton{
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Color highlightColor = new Color(0,0,0);
+	private Color playerColor = new Color(0,0,0);
 	private Color pressedColor = new Color(230,230,230);
-	private Color textColor = new Color(0,0,0);
 	
 	private ArrayList<Player> playersPresent = new ArrayList<Player>();
 	private Obstacle obstacle;
@@ -65,8 +64,13 @@ public class BoardSlot extends JButton{
 	}
 	
 	public void removePlayer(Player player) {
-		if(playersPresent.remove(player) && playersPresent.size() == 0) {
-			playerIsPresent = false;
+		if(playersPresent.remove(player)) {
+			if(playersPresent.size() == 0) {
+				playerIsPresent = false;
+				playerColor = Color.BLACK;
+			} else {
+				updateColor();
+			}
 		}
 	}
 	
@@ -96,7 +100,7 @@ public class BoardSlot extends JButton{
 		g /= playersPresent.size();
 		b /= playersPresent.size();
 		
-		highlightColor = new Color(r,g,b);
+		playerColor = new Color(r,g,b);
 	}
 	
 	private void calculateFontSize() {
@@ -128,16 +132,16 @@ public class BoardSlot extends JButton{
 	public void paintComponent(Graphics gfx) {
 		gfx.clearRect(0, 0, getWidth(), getHeight());
 		if(getModel().isRollover()) {
-			gfx.setColor(highlightColor);
+			gfx.setColor(playerColor);
 			gfx.drawRect(3, 3, getWidth() - 7, getHeight() - 7);
 		}
 		if(getModel().isPressed()) {
 			gfx.setColor(pressedColor);
 			gfx.fillRect(3, 3, getWidth() - 6, getHeight() - 6);
 		}
-		gfx.setColor(textColor);
+		gfx.setColor(playerColor);
 		
-		if(playerIsPresent) {		
+		if(playerIsPresent && (slotState == State.EMPTY || slotState == State.START)) {		
 			int yOffSet = 0;
 			int greatestLength = 0;
 			
@@ -204,7 +208,7 @@ public class BoardSlot extends JButton{
 	
 	@Override
 	public void paintBorder(Graphics gfx) {
-		gfx.setColor(highlightColor);
+		gfx.setColor(playerColor);
 		gfx.drawRect(1, 1, getWidth() - 3, getHeight() - 3);
 		if(playerIsPresent) {
 			gfx.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
