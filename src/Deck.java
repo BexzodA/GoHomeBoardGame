@@ -1,3 +1,4 @@
+import java.awt.Font;
 import java.util.Random;
 
 import javax.swing.JLabel;
@@ -16,6 +17,7 @@ public class Deck extends JLabel{
 		this.brd = brd;
 		this.setText(defaultTxt);
 		this.setHorizontalAlignment(SwingConstants.CENTER);
+		this.setFont(new Font(this.getFont().getName(), Font.BOLD, 20));
 	}
 	
 	public void update() {
@@ -25,7 +27,8 @@ public class Deck extends JLabel{
 	
 	public Card drawCard() {
 		Random rng = new Random();
-		int rand = rng.nextInt(10);
+		int max = brd.isAutoPlaying() ? 9 : 10;
+		int rand = rng.nextInt(max);
 		switch(rand) {
 		case 0:
 		case 1:
@@ -33,7 +36,7 @@ public class Deck extends JLabel{
 			return new Card() {
 				@Override
 				public void whenDrawn() {
-					brd.moveCurrentPlayer(1);
+					brd.move(1);
 				}
 			};
 		case 2:
@@ -42,7 +45,7 @@ public class Deck extends JLabel{
 			return new Card() {
 				@Override
 				public void whenDrawn() {
-					brd.moveCurrentPlayer(2);
+					brd.move(2);
 				}
 			};
 		case 4:
@@ -51,7 +54,7 @@ public class Deck extends JLabel{
 			return new Card() {
 				@Override
 				public void whenDrawn() {
-					brd.moveCurrentPlayer(3);
+					brd.move(3);
 				}
 			};
 		case 6:
@@ -60,11 +63,11 @@ public class Deck extends JLabel{
 			return new Card() {
 				@Override
 				public void whenDrawn() {
-					brd.moveCurrentPlayer(4);
+					brd.move(4);
 				}
 			};
 		case 8:
-			this.setText("Loose\nTurn.");
+			this.setText("Loose Turn.");
 			return new Card() {
 				@Override
 				public void whenDrawn() {
@@ -88,4 +91,5 @@ public class Deck extends JLabel{
 			};
 		}
 	}
+	
 }

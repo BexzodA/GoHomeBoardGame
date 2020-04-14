@@ -27,7 +27,6 @@ public class PlayerSelecter extends JPanel{
 		textField.addActionListener((e)->
 		{;
 			playerName = textField.getText();
-			System.out.println(playerName);
 		});
 		
 		pickColor = new JButton("Pick Color");
@@ -36,6 +35,7 @@ public class PlayerSelecter extends JPanel{
 		{
 			playerColor = JColorChooser.showDialog(pickColor, "Choose Color", Color.RED);
 			pickColor.setForeground(playerColor);
+			textField.setForeground(playerColor);
 		});
 		
 		addComponents();

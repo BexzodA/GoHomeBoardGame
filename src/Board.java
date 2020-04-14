@@ -1,5 +1,4 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 import java.util.Stack;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,12 +28,18 @@ public class Board extends JPanel {
 	private Stack<Player> turnStack;
 	private Stack<Player> que;
 	
-	private static final int PLAYER_MOVE_TIME = 1000;
+	public static final int PLAYER_MOVE_TIME = 1000;
 	
 	private Player currentPlayer;
 	private Deck deck;
 	
 	private boolean movingPlayer = false;
+	private boolean switchingPlayer = false;
+	
+	private boolean gameWon = false;
+	private boolean autoPlaying = false;
+	
+	private Thread autoPlayThread;
 	
 	public Board(ArrayList<PlayerSelecter> playerConfigs) {
 		super();
@@ -76,100 +80,97 @@ public class Board extends JPanel {
 	public Player getCurPlayer() {
 		return currentPlayer;
 	}
+
 	
-	public synchronized void moveCurrentPlayer(int amount) {
+	public synchronized void move(int amount) {
 		if(!movingPlayer) {
 			movingPlayer = true;
-			if(turnStack.isEmpty()) {
-				repopulateTurnStack();
-			}
-			Player player = turnStack.pop();
-			moveFowardPlayer(player, amount);
-			que.push(player);
-			if(turnStack.size() > 0) {
-				currentPlayer = turnStack.peek();
-			}
-			else {
-				repopulateTurnStack();
-				currentPlayer = turnStack.peek();
-			}
+			Player player = popPlayersTurn();
+			Thread move = new Thread(
+					() ->
+					{
+						int amountCopy = amount;
+						int delta = 1;
+						for(int i = 0; i < amountCopy; i++) {
+							BoardSlot location = player.getLocation();
+							
+							if(location.getIndex() == 0 && delta == -1) {
+								updateLabel();
+								movingPlayer = false;
+								return;
+							}
+							
+							if(location.getIndex() == 21 && delta == 1) {
+								updateLabel();
+								movingPlayer = false;
+								gameWon = true;
+								return;
+							}
+							
+							location.removePlayer(player);
+							slots[location.getIndex() + delta].addPlayer(player);
+							
+							location.repaint();
+							slots[location.getIndex() + delta].repaint();
+							
+							player.updateLocation(slots[location.getIndex() + delta]);
+							location = player.getLocation();
+							
+							try {
+								Thread.sleep(PLAYER_MOVE_TIME);
+							} catch(InterruptedException e) {
+								e.printStackTrace();
+							}	
+							
+							if(slots[location.getIndex()].hasObstacle() && i == amountCopy - 1 && delta == 1) {
+								delta = -1;
+								amountCopy += slots[location.getIndex()].getObstacle().getSpacesToMove();
+							} else if(location.hasObstacle() && i == amountCopy - 1 && delta == -1) {
+								amountCopy += location.getObstacle().getSpacesToMove();
+							}
+							
+						}
+						updateLabel();
+						movingPlayer = false;
+						if(autoPlaying) {
+							synchronized(autoPlayThread) {
+								autoPlayThread.notify();
+							}
+						}
+					}
+			);
+			move.start();
 		}
 	}
 	
-	private synchronized void moveFowardPlayer(Player player, int amount) {
-		Thread moveFoward = new Thread(
-				() ->
-				{
-					for(int i = 0; i < amount; i++) {
-						BoardSlot location = player.getLocation();
-						
-						location.removePlayer(player);
-						slots[location.getIndex() + 1].addPlayer(player);
-						
-						location.repaint();
-						slots[location.getIndex() + 1].repaint();
-						
-						player.updateLocation(slots[location.getIndex() + 1]);
-						location = player.getLocation();
-						
-						
-						try {
-							Thread.sleep(PLAYER_MOVE_TIME);
-						} catch(InterruptedException e) {
-							e.printStackTrace();
-						}	
-						
-						if(slots[location.getIndex()].hasObstacle() && i == amount - 1) {
-							moveBackPlayer(player, slots[location.getIndex()].getObstacle().getSpacesToMove());
-							return;
-						}
-						
-					}
-					updateLabel();
-					movingPlayer = false;
-				}
-		);
-		moveFoward.start();
+	public void switchPlayer() {
+		movingPlayer = true;
+		switchingPlayer = true;
 	}
 	
-	private synchronized void moveBackPlayer(Player player, int amount) {
-		Thread moveBackward = new Thread(
-				() ->{
-					int amountcopy = amount;
-					for(int i = 0; i < amountcopy; i++) {
-						BoardSlot location = player.getLocation();
-						
-						if(location.getIndex() == 0) {
-							updateLabel();
-							movingPlayer = false;
-							return;
-						}
-						
-						location.removePlayer(player);
-						slots[location.getIndex() - 1].addPlayer(player);
-						
-						location.repaint();
-						slots[location.getIndex() - 1].repaint();
-						
-						player.updateLocation(slots[location.getIndex() - 1]);
-						location = player.getLocation();
-						
-						if(location.hasObstacle() && i == amountcopy - 1) {
-							amountcopy += location.getObstacle().getSpacesToMove();
-						}
-						
-						try {
-							Thread.sleep(PLAYER_MOVE_TIME);
-						} catch(InterruptedException e) {
-							e.printStackTrace();
-						}
-						
-					}
-					updateLabel();
-					movingPlayer = false;
-				}
-		);
-		moveBackward.start();
+	public boolean isSwitchtingPlayer() {
+		return switchingPlayer;
+	}
+	
+	public void endSwitching() {
+		switchingPlayer = false;
+		movingPlayer = false;
+	}
+	
+	public Player popPlayersTurn() {
+		if(turnStack.isEmpty()) {
+			repopulateTurnStack();
+		}
+		Player player = turnStack.pop();
+		que.push(player);
+		if(turnStack.size() > 0) {
+			currentPlayer = turnStack.peek();
+		}
+		else {
+			repopulateTurnStack();
+			currentPlayer = turnStack.peek();
+		}
+		return player;
 	}
 	
 	private void repopulateTurnStack() {
@@ -183,6 +184,7 @@ public class Board extends JPanel {
 		slots = new BoardSlot[22];
 		for (int i = 0; i < slots.length; i++) {
 			slots[i] = new BoardSlot(i);
+			slots[i].addActionListener(new SwitchPlayerListener(this, slots[i]));
 		}	
 	}
 	
@@ -209,19 +211,32 @@ public class Board extends JPanel {
 	}
 	
 	public void looseTurn() {
-		System.out.println("looseturn");
+		movingPlayer = true;
+		Thread t = new Thread(()-> 
+		{
+			try {
+				Thread.sleep(2000);
+				popPlayersTurn();
+				updateLabel();
+				movingPlayer = false;
+				if(autoPlaying) {
+					synchronized(autoPlayThread) {
+						autoPlayThread.notify();
+					}
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		t.start();
 	}
 	
-	private void updateLabel() {
+	public void updateLabel() {
 		curPlayerTurn.setText(currentPlayer.getName() + "'s Turn!");
 		curPlayerTurn.setForeground(currentPlayer.getColor());
 		deck.update();
 	}
-	
-	public void switchPlayer() {
-		System.out.println("switchplayers");
-	}
-	
+
 	public void placeComp(Component comp, Container panel, int x, int y, int w, int h) {
 		    GridBagConstraints cons = new GridBagConstraints();
 		    cons.gridx = x;
@@ -290,7 +305,7 @@ public class Board extends JPanel {
 				
 		play = new JButton("Play");
 		play.addActionListener((e)->{
-			if(!movingPlayer) {
+			if(!movingPlayer && !autoPlaying) {
 				deck.drawCard().whenDrawn();;
 			}
 		});
@@ -300,6 +315,28 @@ public class Board extends JPanel {
 		
 		autoPlay = new JButton("Auto Play");
 		autoPlay.setFocusable(false);
+		autoPlay.addActionListener((e)->{
+			if(!autoPlaying)
+				autoPlaying = true;
+			else 
+				autoPlaying = false;
+			autoPlayThread = new Thread(()-> {
+				while(!gameWon && autoPlaying) {
+					if(!movingPlayer) {
+						deck.drawCard().whenDrawn();
+					}
+					synchronized(autoPlayThread) {
+						try {
+							autoPlayThread.wait();
+						} catch(InterruptedException ex) {
+							ex.printStackTrace();
+						}
+					}
+				}
+				}
+			);
+			autoPlayThread.start();
+			});
 		
 		utilBts.add(autoPlay);
 		
@@ -310,6 +347,10 @@ public class Board extends JPanel {
 	
 	public static int getFontSize(float factor) {
 		return (int) ((Window.getHeight() + Window.getWidth()) / factor);
+	}
+	
+	public boolean isAutoPlaying() {
+		return autoPlaying;
 	}
 	
 }

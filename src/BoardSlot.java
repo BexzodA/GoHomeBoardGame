@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
@@ -57,21 +56,34 @@ public class BoardSlot extends JButton{
 		return index;
 	}
 	
+	public boolean playerIsPresent() {
+		return playerIsPresent;
+	}
+	
 	public void addPlayer(Player player) {
 		playersPresent.add(player);
 		updateColor();
 		playerIsPresent = true;
 	}
 	
-	public void removePlayer(Player player) {
-		if(playersPresent.remove(player)) {
-			if(playersPresent.size() == 0) {
-				playerIsPresent = false;
-				playerColor = Color.BLACK;
-			} else {
-				updateColor();
+	public Player removePlayer(Player player) {
+		Player p = null;			
+		for(Player e : playersPresent) {
+			if(e == player) {
+				p = e;
 			}
 		}
+		if(p != null) {
+			if(playersPresent.remove(player)) {
+				if(playersPresent.size() == 0) {
+					playerIsPresent = false;
+					playerColor = Color.BLACK;
+				} else {
+					updateColor();
+				}
+			}
+		}
+		return p;
 	}
 	
 	public boolean hasObstacle() {
@@ -126,6 +138,20 @@ public class BoardSlot extends JButton{
 		}
 		else
 			System.err.println("Attempted to change the state of a slot more than once");
+	}
+	
+	public Player removeFirstPlayer() {
+		if(playersPresent.size() > 0) {
+			Player p = playersPresent.remove(0);
+			if(playersPresent.size() == 0) {
+				playerIsPresent = false;
+				playerColor = Color.BLACK;
+			} else {
+				updateColor();
+			}
+			return p;
+		}
+		return null;
 	}
 	
 	@Override
