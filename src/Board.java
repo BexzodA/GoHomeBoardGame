@@ -33,6 +33,7 @@ public class Board extends JPanel {
 	public static final int PLAYER_MOVE_TIME = 1000;
 	
 	private Player currentPlayer;
+	private Player highestScore;
 	private Deck deck;
 	
 	private boolean movingPlayer = false;
@@ -40,6 +41,8 @@ public class Board extends JPanel {
 	
 	private boolean gameWon = false;
 	private boolean autoPlaying = false;
+	
+	private boolean doNotWait = false;
 	
 	private Thread autoPlayThread;
 	
@@ -73,6 +76,7 @@ public class Board extends JPanel {
 		}
 		
 		currentPlayer = turnStack.peek();
+		highestScore = currentPlayer;
 		
 		addUtilities();
 		addComponents();
@@ -81,6 +85,14 @@ public class Board extends JPanel {
 		slots[0].setAsStart();
 		slots[21].setAsHome();
 		
+	}
+	
+	public boolean isDoNotWait() {
+		return doNotWait;
+	}
+	
+	public void dontWait() {
+		doNotWait = true;
 	}
 	
 	public Player getCurPlayer() {
@@ -103,15 +115,21 @@ public class Board extends JPanel {
 							if(location.getIndex() == 0 && delta == -1) {
 								updateLabel();
 								movingPlayer = false;
+								if(autoPlaying) {
+									synchronized(autoPlayThread) {
+										autoPlayThread.notify();
+									}
+								}
 								return;
 							}
-							
 							
 							location.removePlayer(player);
 							slots[location.getIndex() + delta].addPlayer(player);
 							
 							location.repaint();
 							slots[location.getIndex() + delta].repaint();
+							
+							player.updateScore(delta);
 							
 							player.updateLocation(slots[location.getIndex() + delta]);
 							location = player.getLocation();
@@ -152,9 +170,26 @@ public class Board extends JPanel {
 		}
 	}
 	
+	public void updateHighest() {
+		for(Player p : players) {
+			if(p.getScore() > highestScore.getScore()) {
+				highestScore = p;
+			}
+		}
+	}
+	
 	public void switchPlayer() {
 		movingPlayer = true;
 		switchingPlayer = true;
+		if(autoPlaying) {
+			if(currentPlayer.getScore() < highestScore.getScore())
+				highestScore.getLocation().getActionListeners()[0].actionPerformed(null);
+			else {
+				popPlayersTurn();
+				updateLabel();
+				endSwitching();
+			}
+		}
 	}
 	
 	public boolean isSwitchtingPlayer() {
@@ -164,6 +199,16 @@ public class Board extends JPanel {
 	public void endSwitching() {
 		switchingPlayer = false;
 		movingPlayer = false;
+		if(autoPlaying) {
+			try {
+				Thread.sleep(1000);
+			} catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+			synchronized(autoPlayThread) {
+				autoPlayThread.notify();
+			}
+		}
 	}
 	
 	public Player popPlayersTurn() {
@@ -339,12 +384,17 @@ public class Board extends JPanel {
 					if(!movingPlayer) {
 						deck.drawCard().whenDrawn();
 					}
-					synchronized(autoPlayThread) {
-						try {
-							autoPlayThread.wait();
-						} catch(InterruptedException ex) {
-							ex.printStackTrace();
+					if(!doNotWait) {
+						synchronized(autoPlayThread) {
+							try {
+								autoPlayThread.wait();
+								updateHighest();
+							} catch(InterruptedException ex) {
+								ex.printStackTrace();
+							}
 						}
+					} else {
+						doNotWait = false;
 					}
 				}
 				}

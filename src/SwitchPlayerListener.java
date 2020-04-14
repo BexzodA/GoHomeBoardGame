@@ -22,8 +22,23 @@ public class SwitchPlayerListener implements ActionListener{
 					board.endSwitching();
 					return;
 				}
+				if(board.isAutoPlaying()) {
+					try {
+						Thread.sleep(1000);
+					} catch(InterruptedException ex) {
+						ex.printStackTrace();
+					}
+				}
+				
 				Player playerSwitching = source.removePlayer(board.getCurPlayer());
+				int switchingScore = playerSwitching.getScore();
 				Player playerBeingSwitched = slot.removeFirstPlayer();
+				int beingSwitchedScore = playerBeingSwitched.getScore();
+				playerSwitching.setScore(beingSwitchedScore);
+				playerBeingSwitched.setScore(switchingScore);
+				
+				board.updateHighest();
+				
 				slot.addPlayer(playerSwitching);
 				playerSwitching.updateLocation(slot);
 				source.addPlayer(playerBeingSwitched);

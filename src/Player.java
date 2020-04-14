@@ -9,6 +9,7 @@ public class Player {
 	private final String playerName;
 	private final Color playerColor;
 	private BoardSlot location;
+	private int score = 0;
 	
 	public Player(String playerName, Color playerColor, BoardSlot location) {
 		this.playerName = playerName;
@@ -26,6 +27,18 @@ public class Player {
 	
 	public void getCurPlayer() {
 		
+	}
+	
+	public void updateScore(int delta) {
+		score += delta;
+	}
+	
+	public void setScore(int score) {
+		this.score = score;
+	}
+	
+	public int getScore() {
+		return score;
 	}
 	
 	public static int getNumOfPlayers() {
