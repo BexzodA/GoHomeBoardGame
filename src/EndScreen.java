@@ -34,6 +34,7 @@ public class EndScreen extends JPanel{
 		congrats.setAlignmentX(0.5f);
 		restart.setAlignmentX(0.5f);
 		restart.setFocusable(false);
+		restart.setForeground(player.getColor());
 		
 		contentPanel.add(congrats);
 		contentPanel.add(restart);
