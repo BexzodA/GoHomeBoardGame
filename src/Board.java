@@ -48,6 +48,10 @@ public class Board extends JPanel {
 	
 	private Player winner = null;
 	
+	private boolean drawing = false;
+	
+
+
 	public Board(ArrayList<PlayerSelecter> playerConfigs, Window window) {
 		super();
 		this.setLayout(new GridBagLayout());
@@ -85,6 +89,14 @@ public class Board extends JPanel {
 		slots[0].setAsStart();
 		slots[21].setAsHome();
 		
+	}
+	
+	public boolean isDrawing() {
+		return drawing;
+	}
+
+	public void setDrawing(boolean drawing) {
+		this.drawing = drawing;
 	}
 	
 	public boolean isDoNotWait() {
@@ -363,9 +375,18 @@ public class Board extends JPanel {
 		utilBts.setLayout(fl);
 				
 		play = new JButton("Play");
+		
+		
+		
 		play.addActionListener((e)->{
 			if(!movingPlayer && !autoPlaying) {
-				deck.drawCard().whenDrawn();;
+				Thread draw = new Thread(()->{
+					deck.drawCard().whenDrawn();
+				});
+				if(!drawing) {
+					draw.start();
+					drawing = true;
+				} 
 			}
 		});
 		play.setFocusable(false);

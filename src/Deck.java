@@ -10,7 +10,12 @@ public class Deck extends JLabel{
 
 	public Board brd;
 	
-	String defaultTxt = "Hit play to play turn.";
+	private Thread anim;
+	
+	private static final int TIMESTEP = 10;
+	private static final int NUMOFFRAMES = 100;
+	
+	private String defaultTxt = "Hit play to play turn.";
 	
 	public Deck(Board brd) {
 		super();
@@ -25,7 +30,16 @@ public class Deck extends JLabel{
 		this.setText(defaultTxt);
 	}
 	
-	public Card drawCard() {
+	public synchronized Card drawCard() {
+		playAnim();
+		synchronized(this) {
+			try {
+				this.wait();
+				brd.setDrawing(false);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		Random rng = new Random();
 		int rand = rng.nextInt(10);
 		int curve = 0;
@@ -75,7 +89,7 @@ public class Deck extends JLabel{
 				}
 			};
 		case 9:
-			this.setText("Switch with another player.");
+			this.setText("Switch");
 			return new Card() {
 				@Override
 				public void whenDrawn() {
@@ -93,45 +107,51 @@ public class Deck extends JLabel{
 		}
 	}
 	
-//	public Card drawCard() {
-//		Random rng = new Random();
-//		int max = 10;
-//		int rand = rng.nextInt(max);
-//		int curve = 0;
-//		switch(rand) {
-//		case 0:
-//		case 1:
-//		case 2:
-//		case 3:
-//		case 4:
-//			this.setText("Moving:\n 4");
-//			return new Card() {
-//				@Override
-//				public void whenDrawn() {
-//					brd.move(4 + curve);
-//				}
-//			};
-//		case 5:
-//		case 6:
-//		case 7:
-//		case 8:
-//		case 9:
-//			this.setText("Switch with another player.");
-//			return new Card() {
-//				@Override
-//				public void whenDrawn() {
-//					brd.dontWait();
-//					brd.switchPlayer();
-//				}
-//			};
-//		default:
-//			return new Card() {
-//				@Override
-//				public void whenDrawn() {
-//					System.err.println("Invalid RN.");
-//				}
-//			};
-//		}
-//	}
+	private synchronized void playAnim() {
+		anim = new Thread(
+			()-> {
+				for(int i = 0; i < NUMOFFRAMES; i++) {
+					Random rng = new Random();
+					int rand = rng.nextInt(10);
+					switch(rand) {
+					case 0:
+					case 1:
+						this.setText("Moving:\n 1");
+						break;
+					case 2:
+					case 3:
+						this.setText("Moving:\n 2");
+						break;
+					case 4:
+					case 5:
+						this.setText("Moving:\n 3");
+						break;
+					case 6:
+					case 7:
+						this.setText("Moving:\n 4");
+						break;
+					case 8:
+						this.setText("Loose Turn.");
+						break;
+					case 9:
+						this.setText("Switch");
+						break;
+					default:
+						System.err.println("Invalid RN.");
+					}
+					this.updateUI();
+					try {
+						Thread.sleep(TIMESTEP);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				synchronized(this) {
+					this.notify();
+				}
+			}
+		);
+		anim.start();
+	}
 	
 }
