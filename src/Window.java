@@ -9,6 +9,7 @@ public class Window {
 	private JFrame window;
 	private PlayerCreationScreen pcs;
 	private Board gameBoard;
+	private EndScreen es;
 	
 	private static float width;
 	private static float height;
@@ -42,9 +43,25 @@ public class Window {
 		window.setVisible(true);
 	}
 	
+	public void switchToEndScreen() {
+		if(gameBoard.isGameWon()) {
+			es = new EndScreen(gameBoard.getWinner(), this);
+			window.getContentPane().remove(gameBoard);
+			window.getContentPane().add(es);
+			((JPanel)window.getContentPane()).updateUI();
+		}
+	}
+	
+	public void restart() {
+		window.getContentPane().removeAll();
+		pcs = new PlayerCreationScreen(this);
+		window.getContentPane().add(pcs);
+		((JPanel)window.getContentPane()).updateUI();
+	}
+	
 	public void switchToBoard() {
 		window.getContentPane().remove(pcs);
-		gameBoard = new Board(pcs.getPlayerSelecters());
+		gameBoard = new Board(pcs.getPlayerSelecters(), this);
 		window.getContentPane().add(gameBoard);
 		((JPanel)window.getContentPane()).updateUI();
 	}

@@ -17,7 +17,17 @@ import javax.swing.SwingConstants;
 
 public class Board extends JPanel {
 	
+	private enum State{
+		WAITING,
+		MOVING,
+		SWITCHING,
+		AUTOPLAYING,
+		GAMEWON;
+	}
+	
 	private static final long serialVersionUID = 134606650518445714L;
+	
+	private Window window;
 	
 	private BoardSlot slots [];
 	private JLabel curPlayerTurn;
@@ -36,14 +46,20 @@ public class Board extends JPanel {
 	private boolean movingPlayer = false;
 	private boolean switchingPlayer = false;
 	
+	private State state = State.WAITING;
+	
 	private boolean gameWon = false;
 	private boolean autoPlaying = false;
 	
 	private Thread autoPlayThread;
 	
-	public Board(ArrayList<PlayerSelecter> playerConfigs) {
+	private Player winner = null;
+	
+	public Board(ArrayList<PlayerSelecter> playerConfigs, Window window) {
 		super();
 		this.setLayout(new GridBagLayout());
+		
+		this.window = window;
 		
 		deck = new Deck(this);
 		
@@ -100,12 +116,6 @@ public class Board extends JPanel {
 								return;
 							}
 							
-							if(location.getIndex() == 21 && delta == 1) {
-								updateLabel();
-								movingPlayer = false;
-								gameWon = true;
-								return;
-							}
 							
 							location.removePlayer(player);
 							slots[location.getIndex() + delta].addPlayer(player);
@@ -121,6 +131,15 @@ public class Board extends JPanel {
 							} catch(InterruptedException e) {
 								e.printStackTrace();
 							}	
+							
+							if(location.getIndex() == 21 && delta == 1) {
+								updateLabel();
+								movingPlayer = false;
+								gameWon = true;
+								winner = player;
+								window.switchToEndScreen();
+								return;
+							}
 							
 							if(slots[location.getIndex()].hasObstacle() && i == amountCopy - 1 && delta == 1) {
 								delta = -1;
@@ -343,6 +362,14 @@ public class Board extends JPanel {
 		util.add(utilBts, BorderLayout.SOUTH);
 		
 		placeCompNotFill(util, this, 1, 1, 6, 3);
+	}
+	
+	public Player getWinner() {
+		return winner;
+	}
+	
+	public boolean isGameWon() {
+		return gameWon;
 	}
 	
 	public static int getFontSize(float factor) {

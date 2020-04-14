@@ -29,6 +29,7 @@ public class Deck extends JLabel{
 		Random rng = new Random();
 		int max = brd.isAutoPlaying() ? 9 : 10;
 		int rand = rng.nextInt(max);
+		int curve = 0;
 		switch(rand) {
 		case 0:
 		case 1:
@@ -36,7 +37,7 @@ public class Deck extends JLabel{
 			return new Card() {
 				@Override
 				public void whenDrawn() {
-					brd.move(1);
+					brd.move(1 + curve);
 				}
 			};
 		case 2:
@@ -45,7 +46,7 @@ public class Deck extends JLabel{
 			return new Card() {
 				@Override
 				public void whenDrawn() {
-					brd.move(2);
+					brd.move(2 + curve);
 				}
 			};
 		case 4:
@@ -54,7 +55,7 @@ public class Deck extends JLabel{
 			return new Card() {
 				@Override
 				public void whenDrawn() {
-					brd.move(3);
+					brd.move(3 + curve);
 				}
 			};
 		case 6:
@@ -63,7 +64,7 @@ public class Deck extends JLabel{
 			return new Card() {
 				@Override
 				public void whenDrawn() {
-					brd.move(4);
+					brd.move(4 + curve);
 				}
 			};
 		case 8:

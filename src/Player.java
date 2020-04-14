@@ -1,6 +1,6 @@
 import java.awt.Color;
 
-public class Player implements Moveable{
+public class Player {
 	
 	private static int numOfPlayers = 0;
 	
@@ -30,11 +30,6 @@ public class Player implements Moveable{
 	
 	public static int getNumOfPlayers() {
 		return numOfPlayers;
-	}
-
-	@Override
-	public void onObstacleHit(Obstacle obs) {
-			
 	}
 	
 	public String getName() {
