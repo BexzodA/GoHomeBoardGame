@@ -17,14 +17,6 @@ import javax.swing.SwingConstants;
 
 public class Board extends JPanel {
 	
-	private enum State{
-		WAITING,
-		MOVING,
-		SWITCHING,
-		AUTOPLAYING,
-		GAMEWON;
-	}
-	
 	private static final long serialVersionUID = 134606650518445714L;
 	
 	private Window window;
@@ -45,8 +37,6 @@ public class Board extends JPanel {
 	
 	private boolean movingPlayer = false;
 	private boolean switchingPlayer = false;
-	
-	private State state = State.WAITING;
 	
 	private boolean gameWon = false;
 	private boolean autoPlaying = false;
@@ -289,10 +279,15 @@ public class Board extends JPanel {
 			for (int j = 0; j < size; j++) {
 				if(location == takenLocations[j]) {
 					location = rng.nextInt(20)+1;
-					j--;
+					j = -1;
 				}
 			}
-			slots[location].addObstacle(new Obstacle(rng.nextInt(4)+1));
+			if(!slots[location - 1].hasObstacle() && !slots[location + 1].hasObstacle())
+				slots[location].addObstacle(new Obstacle(rng.nextInt(4)+1));
+			else {
+				i--;
+				continue;
+			}
 			takenLocations[i] = location;
 			size++;
 		}
